@@ -1,0 +1,30 @@
+# Fast checks before each commit. Install once: pip install pre-commit && pre-commit install
+# The full checks (types, tests, clippy) stay in scripts/check.ps1 and CI.
+exclude: ^(crates/ui/fonts/|e2e/vendor/|models/|target/|crates/ui/dist/)
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: cargo fmt --all -- --check
+        language: system
+        types: [rust]
+        pass_filenames: false
+      - id: ruff-check
+        name: ruff check
+        entry: ruff check
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: ruff format --check
+        language: system
+        types: [python]

@@ -1,0 +1,14 @@
+[package]
+name = "axonhand-track"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Hand Sight command-line hand tracker: raw frames in, landmark files out."
+
+[dependencies]
+axonhand-hand = { path = "../hand" }
+thiserror = "2"
+
+[lints]
+workspace = true

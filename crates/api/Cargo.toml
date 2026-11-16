@@ -1,0 +1,15 @@
+[package]
+name = "axonhand-api"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Request, response and error types shared by the Hand Sight server and web app."
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+utoipa = "5"
+serde_json = "1"
+
+[lints]
+workspace = true

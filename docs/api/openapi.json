@@ -1,0 +1,1531 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Hand Sight API",
+    "description": "Research prototype. Results are research-grade measures, not clinical scores.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Report that the server is running.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "The server is ready.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs": {
+      "post": {
+        "summary": "Run a test on a video. JSON body `JobRequest`. Asking again for the same video, test version, model and settings returns the existing job.",
+        "operationId": "create_job",
+        "responses": {
+          "200": {
+            "description": "The result already exists or the same work is already waiting.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Work was queued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is invalid; the error names the field.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such video.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{id}": {
+      "get": {
+        "summary": "Report a job's state and progress.",
+        "operationId": "get_job",
+        "responses": {
+          "200": {
+            "description": "The job.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such job.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{id}/events": {
+      "get": {
+        "summary": "Server-sent events (`event: job`, data is a `Job`): the current state at once, then every change, ending when the job succeeds or fails.",
+        "operationId": "job_events",
+        "responses": {
+          "200": {
+            "description": "An event stream."
+          },
+          "404": {
+            "description": "No such job.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/results": {
+      "get": {
+        "summary": "List saved results, newest first. Optional filters: `test_id`, `participant_code`.",
+        "operationId": "list_results",
+        "responses": {
+          "200": {
+            "description": "The matching results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/results/{key}": {
+      "get": {
+        "summary": "Read a saved result.",
+        "operationId": "get_result",
+        "responses": {
+          "200": {
+            "description": "The result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/results/{key}/export.csv": {
+      "get": {
+        "summary": "Download a result as CSV, with header lines naming the test, version, model and settings.",
+        "operationId": "export_result_csv",
+        "responses": {
+          "200": {
+            "description": "The CSV file."
+          },
+          "404": {
+            "description": "No such result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/results/{key}/landmarks": {
+      "get": {
+        "summary": "Read the hand landmarks of every frame, for drawing over the video.",
+        "operationId": "get_landmarks",
+        "responses": {
+          "200": {
+            "description": "The landmarks.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LandmarkOverlay"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such result, or it has no landmarks.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/results/{key}/scores": {
+      "get": {
+        "summary": "List the scores clinicians gave to a result.",
+        "operationId": "list_scores",
+        "responses": {
+          "200": {
+            "description": "The scores.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Save one clinician's score (0 to 4) for a result. JSON body `ScoreRequest`. Saving again with the same rater replaces that rater's score.",
+        "operationId": "put_score",
+        "responses": {
+          "200": {
+            "description": "The saved score.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicianScore"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A field is invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/results/{key}/signals": {
+      "get": {
+        "summary": "Read the data behind a result's plots.",
+        "operationId": "get_signals",
+        "responses": {
+          "200": {
+            "description": "The signals.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Signals"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tests": {
+      "get": {
+        "summary": "List installed tests, including planned and broken ones.",
+        "operationId": "list_tests",
+        "responses": {
+          "200": {
+            "description": "The tests.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tests/{id}": {
+      "get": {
+        "summary": "Describe one test: capture rules, metrics and settings.",
+        "operationId": "get_test",
+        "responses": {
+          "200": {
+            "description": "The test.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such test.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/videos": {
+      "get": {
+        "summary": "List stored videos, newest first. Optional filters: `participant_code`, `hand`.",
+        "operationId": "list_videos",
+        "responses": {
+          "200": {
+            "description": "The matching videos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Store one video. Multipart form with `participant_code`, `visit_date`, `hand` and `file`.",
+        "operationId": "upload_video",
+        "responses": {
+          "200": {
+            "description": "An identical file was already stored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Stored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A field is missing or invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The file is too large.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The file is not a readable video.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/videos/{id}": {
+      "get": {
+        "summary": "Describe one stored video.",
+        "operationId": "get_video",
+        "responses": {
+          "200": {
+            "description": "The video.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Video"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such video.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnalysisResult": {
+        "type": "object",
+        "description": "A saved analysis. Never changed after it is written.",
+        "required": [
+          "key",
+          "video_id",
+          "test_id",
+          "test_name",
+          "test_version",
+          "model",
+          "parameters",
+          "measures",
+          "quality",
+          "notes",
+          "illustrative",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "description": "When the result was created, as UTC `YYYY-MM-DDTHH:MM:SSZ`."
+          },
+          "illustrative": {
+            "type": "boolean",
+            "description": "True when the numbers must be shown with an \"Illustrative\" label because they do not come\nfrom a validated pipeline."
+          },
+          "key": {
+            "type": "string",
+            "description": "The result key."
+          },
+          "measures": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MeasureValue"
+            },
+            "description": "The numbers."
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelInfo",
+            "description": "The hand model used."
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Remarks from the test and from the system."
+          },
+          "parameters": {
+            "type": "object",
+            "description": "Every setting the test ran with.",
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "quality": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QualityCheck"
+            },
+            "description": "Checks on how far the numbers can be trusted."
+          },
+          "test_id": {
+            "type": "string",
+            "description": "The test that was run."
+          },
+          "test_name": {
+            "type": "string",
+            "description": "Name of the test."
+          },
+          "test_version": {
+            "type": "string",
+            "description": "Version of the test plug-in that produced the numbers."
+          },
+          "video_id": {
+            "type": "string",
+            "description": "The video that was analysed."
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "description": "Body of every error response.",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode",
+            "description": "Why the request failed."
+          },
+          "field": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The request field the problem concerns, when there is one."
+          },
+          "message": {
+            "type": "string",
+            "description": "A plain sentence that is safe to show to the user."
+          }
+        }
+      },
+      "CaptureRules": {
+        "type": "object",
+        "description": "Requirements a video must meet for a test to give meaningful numbers.",
+        "required": [
+          "min_fps",
+          "min_duration_seconds",
+          "board_required",
+          "instructions"
+        ],
+        "properties": {
+          "board_required": {
+            "type": "boolean",
+            "description": "Whether the calibration board must be visible for results in centimetres."
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Plain-language filming instructions shown to the person recording."
+          },
+          "min_duration_seconds": {
+            "type": "number",
+            "format": "double",
+            "description": "Shortest clip, in seconds."
+          },
+          "min_fps": {
+            "type": "number",
+            "format": "double",
+            "description": "Lowest frame rate, in frames per second."
+          }
+        }
+      },
+      "ClinicianScore": {
+        "type": "object",
+        "description": "A score as stored.",
+        "required": [
+          "result_key",
+          "rater",
+          "score",
+          "note",
+          "recorded_at"
+        ],
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "An optional remark."
+          },
+          "rater": {
+            "type": "string",
+            "description": "Who gave the score."
+          },
+          "recorded_at": {
+            "type": "string",
+            "description": "When the score was last saved, as UTC `YYYY-MM-DDTHH:MM:SSZ`."
+          },
+          "result_key": {
+            "type": "string",
+            "description": "The result that was scored."
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The score, from 0 to 4.",
+            "minimum": 0
+          }
+        }
+      },
+      "ErrorCode": {
+        "type": "string",
+        "description": "Stable machine-readable reason for a failed request.\n\nNew codes may be added; clients must treat an unknown code as [`ErrorCode::Internal`].\nExisting codes never change meaning.",
+        "enum": [
+          "invalid_request",
+          "not_found",
+          "conflict",
+          "too_large",
+          "unsupported_media",
+          "internal"
+        ]
+      },
+      "EventData": {
+        "type": "object",
+        "description": "Marked moments with a value each, for example one per tap.",
+        "required": [
+          "id",
+          "name",
+          "unit",
+          "times",
+          "values"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifier."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name shown to people."
+          },
+          "times": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "Time of each event, in seconds."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of the values."
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "Value of each event."
+          }
+        }
+      },
+      "GateCheck": {
+        "type": "object",
+        "description": "One line of the quality gate report.",
+        "required": [
+          "check",
+          "status",
+          "detail"
+        ],
+        "properties": {
+          "check": {
+            "$ref": "#/components/schemas/GateCheckName",
+            "description": "What was checked."
+          },
+          "detail": {
+            "type": "string",
+            "description": "A short plain-language explanation shown to the person who uploaded the video."
+          },
+          "status": {
+            "$ref": "#/components/schemas/GateStatus",
+            "description": "Whether the video passed."
+          }
+        }
+      },
+      "GateCheckName": {
+        "type": "string",
+        "description": "What a quality gate check looks at.",
+        "enum": [
+          "frame_rate",
+          "duration",
+          "hand_visible",
+          "board_visible"
+        ]
+      },
+      "GateStatus": {
+        "type": "string",
+        "description": "Result of one quality gate check.",
+        "enum": [
+          "pass",
+          "fail",
+          "not_checked"
+        ]
+      },
+      "Hand": {
+        "type": "string",
+        "description": "Which hand was filmed.",
+        "enum": [
+          "left",
+          "right"
+        ]
+      },
+      "Health": {
+        "type": "object",
+        "description": "Body of `GET /api/health`.",
+        "required": [
+          "status",
+          "version"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus",
+            "description": "Always `ok` while the server can answer."
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the server program."
+          }
+        }
+      },
+      "HealthStatus": {
+        "type": "string",
+        "description": "Overall state reported by the health check.",
+        "enum": [
+          "ok"
+        ]
+      },
+      "Job": {
+        "type": "object",
+        "description": "A request to analyse a video, and how far it has got.",
+        "required": [
+          "id",
+          "state",
+          "result_key",
+          "video_id",
+          "test_id",
+          "step",
+          "progress",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "description": "When the job was created, as UTC `YYYY-MM-DDTHH:MM:SSZ`."
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why the job failed, when it did. Safe to show to the user."
+          },
+          "id": {
+            "type": "string",
+            "description": "Identifier of the job."
+          },
+          "progress": {
+            "type": "number",
+            "format": "double",
+            "description": "Fraction of the work done, from 0 to 1."
+          },
+          "result_key": {
+            "type": "string",
+            "description": "Key of the result this job produces. The same video, test version, model and settings\nalways give the same key."
+          },
+          "state": {
+            "$ref": "#/components/schemas/JobState",
+            "description": "Current state."
+          },
+          "step": {
+            "type": "string",
+            "description": "What is happening now, in plain words. Empty when queued or finished."
+          },
+          "test_id": {
+            "type": "string",
+            "description": "The test being run."
+          },
+          "video_id": {
+            "type": "string",
+            "description": "The video being analysed."
+          }
+        }
+      },
+      "JobRequest": {
+        "type": "object",
+        "description": "Body of `POST /api/jobs`: which video to analyse with which test.",
+        "required": [
+          "video_id",
+          "test_id",
+          "metrics"
+        ],
+        "properties": {
+          "device": {
+            "$ref": "#/components/schemas/ComputeDevice",
+            "description": "Where to run the hand model. The CPU unless the NPU is asked for."
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Metric ids to compute. At least one."
+          },
+          "parameters": {
+            "type": "object",
+            "description": "Settings to change from their defaults.",
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "test_id": {
+            "type": "string",
+            "description": "Id of an available test."
+          },
+          "video_id": {
+            "type": "string",
+            "description": "Id of a stored video."
+          }
+        }
+      },
+      "JobState": {
+        "type": "string",
+        "description": "Where a job stands.",
+        "enum": [
+          "queued",
+          "running",
+          "succeeded",
+          "failed"
+        ]
+      },
+      "LandmarkOverlay": {
+        "type": "object",
+        "description": "The hand landmarks of a video, for drawing over it. Served by `GET /api/results/{key}/landmarks`.\n\nPositions are in pixels of the upright picture (the way a person sees the video), so they can\nbe scaled to the size the video is shown at.",
+        "required": [
+          "fps",
+          "points"
+        ],
+        "properties": {
+          "fps": {
+            "type": "number",
+            "format": "double",
+            "description": "Frames per second of the video, to turn a playing time into a frame number."
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "description": "For each frame, the 21 landmarks as `[x, y]` in the MediaPipe numbering (`None` for one\nthat was not found), or `None` for the whole frame when no hand was found."
+          }
+        }
+      },
+      "MeasureValue": {
+        "type": "object",
+        "description": "One number of a result, with its definition.",
+        "required": [
+          "metric_id",
+          "name",
+          "unit"
+        ],
+        "properties": {
+          "metric_id": {
+            "type": "string",
+            "description": "Metric identifier."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name shown to people."
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why there is no value."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of the value."
+          },
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "The value, or `None` when it could not be measured."
+          }
+        }
+      },
+      "MetricDef": {
+        "type": "object",
+        "description": "One number a test can report.",
+        "required": [
+          "id",
+          "name",
+          "unit",
+          "description",
+          "default_selected"
+        ],
+        "properties": {
+          "default_selected": {
+            "type": "boolean",
+            "description": "Whether the metric is ticked by default when running the test."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the number means, in one or two sentences."
+          },
+          "id": {
+            "type": "string",
+            "description": "Stable identifier, for example `tap_rate`."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name shown to people."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of the value, for example `taps/s`. Empty for a pure count."
+          }
+        }
+      },
+      "ModelInfo": {
+        "type": "object",
+        "description": "The hand model that produced the landmarks.",
+        "required": [
+          "name",
+          "hash",
+          "stand_in"
+        ],
+        "properties": {
+          "device": {
+            "type": "string",
+            "description": "Where the model ran: `CPU` or `NPU`. Empty for a stand-in, and for results saved before\nthis was recorded."
+          },
+          "hash": {
+            "type": "string",
+            "description": "Fingerprint of the model's files, so a different model gives a different result key."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the model."
+          },
+          "stand_in": {
+            "type": "boolean",
+            "description": "True for a stand-in used in development. Its numbers are not measurements of a real hand."
+          }
+        }
+      },
+      "ParameterDef": {
+        "type": "object",
+        "description": "A setting a person may change before running a test.",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "kind",
+          "default"
+        ],
+        "properties": {
+          "default": {
+            "type": "number",
+            "format": "double",
+            "description": "Value used unless the person changes it. For `boolean`, 0 is false and 1 is true."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the setting changes."
+          },
+          "id": {
+            "type": "string",
+            "description": "Stable identifier."
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ParameterKind",
+            "description": "The type of the value."
+          },
+          "max": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Largest allowed value, for number and integer settings."
+          },
+          "min": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Smallest allowed value, for number and integer settings."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name shown to people."
+          }
+        }
+      },
+      "ParameterKind": {
+        "type": "string",
+        "description": "The type of a test setting.",
+        "enum": [
+          "number",
+          "integer",
+          "boolean"
+        ]
+      },
+      "QualityCheck": {
+        "type": "object",
+        "description": "One quality check on a result.",
+        "required": [
+          "name",
+          "status",
+          "detail"
+        ],
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "A plain-language explanation."
+          },
+          "name": {
+            "type": "string",
+            "description": "What was checked."
+          },
+          "status": {
+            "$ref": "#/components/schemas/QualityStatus",
+            "description": "How it came out."
+          }
+        }
+      },
+      "QualityStatus": {
+        "type": "string",
+        "description": "Outcome of a quality check on a result.",
+        "enum": [
+          "pass",
+          "flag",
+          "fail"
+        ]
+      },
+      "ResultList": {
+        "type": "object",
+        "description": "Body of `GET /api/results`.",
+        "required": [
+          "results"
+        ],
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResultSummary"
+            },
+            "description": "The matching results, newest first."
+          }
+        }
+      },
+      "ResultSummary": {
+        "type": "object",
+        "description": "One saved result in a list, with the video it came from.",
+        "required": [
+          "key",
+          "video_id",
+          "test_id",
+          "test_version",
+          "created_at",
+          "participant_code",
+          "visit_date",
+          "hand"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "description": "When the result was created, as UTC `YYYY-MM-DDTHH:MM:SSZ`."
+          },
+          "hand": {
+            "$ref": "#/components/schemas/Hand",
+            "description": "Which hand was filmed."
+          },
+          "key": {
+            "type": "string",
+            "description": "The result key."
+          },
+          "participant_code": {
+            "type": "string",
+            "description": "Participant code of the video."
+          },
+          "test_id": {
+            "type": "string",
+            "description": "The test that was run."
+          },
+          "test_version": {
+            "type": "string",
+            "description": "Version of the test plug-in that produced the numbers."
+          },
+          "video_id": {
+            "type": "string",
+            "description": "The video that was analysed."
+          },
+          "visit_date": {
+            "type": "string",
+            "description": "Visit date of the video, as `YYYY-MM-DD`."
+          }
+        }
+      },
+      "ScoreList": {
+        "type": "object",
+        "description": "Body of `GET /api/results/{key}/scores`.",
+        "required": [
+          "scores"
+        ],
+        "properties": {
+          "scores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicianScore"
+            },
+            "description": "The scores of this result, by rater name."
+          }
+        }
+      },
+      "ScoreRequest": {
+        "type": "object",
+        "description": "Body of `PUT /api/results/{key}/scores`: one clinician's score for a result. Sending again\nwith the same rater replaces that rater's earlier score.",
+        "required": [
+          "rater",
+          "score"
+        ],
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "An optional remark."
+          },
+          "rater": {
+            "type": "string",
+            "description": "Who gave the score, for example initials. Several raters can score the same result."
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The score, from 0 (normal) to 4 (severe).",
+            "minimum": 0
+          }
+        }
+      },
+      "SeriesData": {
+        "type": "object",
+        "description": "A signal sampled at a fixed rate.",
+        "required": [
+          "id",
+          "name",
+          "unit",
+          "start_seconds",
+          "step_seconds",
+          "values"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifier."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name shown to people."
+          },
+          "start_seconds": {
+            "type": "number",
+            "format": "double",
+            "description": "Time of the first value, in seconds."
+          },
+          "step_seconds": {
+            "type": "number",
+            "format": "double",
+            "description": "Seconds between values."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of the values."
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The values."
+          }
+        }
+      },
+      "Signals": {
+        "type": "object",
+        "description": "Body of `GET /api/results/{key}/signals`: the data behind a result's plots.",
+        "required": [
+          "series",
+          "events"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventData"
+            },
+            "description": "Marked moments."
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeriesData"
+            },
+            "description": "Regularly sampled signals."
+          }
+        }
+      },
+      "TestDetail": {
+        "type": "object",
+        "description": "Body of `GET /api/tests/{id}`.",
+        "required": [
+          "summary",
+          "capture",
+          "metrics",
+          "parameters"
+        ],
+        "properties": {
+          "capture": {
+            "$ref": "#/components/schemas/CaptureRules",
+            "description": "What a video must meet."
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricDef"
+            },
+            "description": "The numbers this test can report."
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParameterDef"
+            },
+            "description": "Settings that may be changed."
+          },
+          "summary": {
+            "$ref": "#/components/schemas/TestSummary",
+            "description": "The same facts as the list shows."
+          }
+        }
+      },
+      "TestList": {
+        "type": "object",
+        "description": "Body of `GET /api/tests`.",
+        "required": [
+          "tests"
+        ],
+        "properties": {
+          "tests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestSummary"
+            },
+            "description": "Every plug-in found, available, planned or broken, ordered by name."
+          }
+        }
+      },
+      "TestStatus": {
+        "type": "string",
+        "description": "Whether a test can be run.",
+        "enum": [
+          "available",
+          "planned",
+          "broken"
+        ]
+      },
+      "TestSummary": {
+        "type": "object",
+        "description": "A line of the list at `GET /api/tests`.",
+        "required": [
+          "id",
+          "version",
+          "name",
+          "clinical_item",
+          "status",
+          "summary"
+        ],
+        "properties": {
+          "clinical_item": {
+            "type": "string",
+            "description": "The clinical item this test supports, for example `MDS-UPDRS 3.4`."
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why the plug-in is broken, when `status` is `broken`."
+          },
+          "id": {
+            "type": "string",
+            "description": "Stable identifier of the test."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name shown to people."
+          },
+          "status": {
+            "$ref": "#/components/schemas/TestStatus",
+            "description": "Whether the test can be run."
+          },
+          "summary": {
+            "type": "string",
+            "description": "One-sentence description."
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the plug-in. Empty when the manifest could not be read."
+          }
+        }
+      },
+      "UploadMeta": {
+        "type": "object",
+        "description": "Details a person must give when uploading a video.",
+        "required": [
+          "participant_code",
+          "visit_date",
+          "hand"
+        ],
+        "properties": {
+          "hand": {
+            "$ref": "#/components/schemas/Hand",
+            "description": "Which hand was filmed."
+          },
+          "participant_code": {
+            "type": "string",
+            "description": "Code identifying the participant. Letters, digits, `-` and `_` only; never a name."
+          },
+          "visit_date": {
+            "type": "string",
+            "description": "Date of the visit, as `YYYY-MM-DD`."
+          }
+        }
+      },
+      "UploadResponse": {
+        "type": "object",
+        "description": "Body of a successful `POST /api/videos`.",
+        "required": [
+          "video",
+          "duplicate"
+        ],
+        "properties": {
+          "duplicate": {
+            "type": "boolean",
+            "description": "True when an identical file was already in the staging area, so nothing new was stored."
+          },
+          "video": {
+            "$ref": "#/components/schemas/Video",
+            "description": "The stored video."
+          }
+        }
+      },
+      "Video": {
+        "type": "object",
+        "description": "A video in the staging area.",
+        "required": [
+          "id",
+          "filename",
+          "participant_code",
+          "visit_date",
+          "hand",
+          "uploaded_at",
+          "size_bytes",
+          "width",
+          "height",
+          "fps",
+          "duration_seconds",
+          "frame_count",
+          "codec",
+          "gate"
+        ],
+        "properties": {
+          "codec": {
+            "type": "string",
+            "description": "Video codec name, for example `h264`."
+          },
+          "duration_seconds": {
+            "type": "number",
+            "format": "double",
+            "description": "Length in seconds."
+          },
+          "filename": {
+            "type": "string",
+            "description": "Name the file had when uploaded."
+          },
+          "fps": {
+            "type": "number",
+            "format": "double",
+            "description": "Frames per second."
+          },
+          "frame_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of frames.",
+            "minimum": 0
+          },
+          "gate": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GateCheck"
+            },
+            "description": "Quality gate report, one entry per check."
+          },
+          "hand": {
+            "$ref": "#/components/schemas/Hand",
+            "description": "Which hand was filmed."
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Frame height in pixels.",
+            "minimum": 0
+          },
+          "id": {
+            "type": "string",
+            "description": "Identifier: the SHA-256 of the file's bytes, in lowercase hex."
+          },
+          "participant_code": {
+            "type": "string",
+            "description": "Code identifying the participant."
+          },
+          "size_bytes": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Size of the file in bytes.",
+            "minimum": 0
+          },
+          "uploaded_at": {
+            "type": "string",
+            "description": "When the video was uploaded, as UTC `YYYY-MM-DDTHH:MM:SSZ`."
+          },
+          "visit_date": {
+            "type": "string",
+            "description": "Date of the visit, as `YYYY-MM-DD`."
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Frame width in pixels.",
+            "minimum": 0
+          }
+        }
+      },
+      "VideoList": {
+        "type": "object",
+        "description": "Body of `GET /api/videos`.",
+        "required": [
+          "videos"
+        ],
+        "properties": {
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Video"
+            },
+            "description": "Videos matching the filters, newest first."
+          }
+        }
+      }
+    }
+  }
+}

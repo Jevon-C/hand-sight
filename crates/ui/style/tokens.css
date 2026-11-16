@@ -1,0 +1,83 @@
+/* Fonts are served from this app (crates/ui/fonts), so no page load contacts another site. */
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-latin-500-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
+}
+
+/* Design tokens: the only place colours, type and spacing are defined.
+   Values come from the published design (clinical, calm, light). */
+:root {
+  --bg: #f7f3ec;
+  --surface: #fffdf8;
+  --border: #cfc8ba;
+  --border-strong: #8c867a;
+  --ink: #1c1b18;
+  --ink-muted: #5b574f;
+  --ink-faint: #6b665c;
+  --accent: #2a4f87;
+  --accent-hover: #1f3d6a;
+  --accent-tint: #e6ebf3;
+  --good-ink: #14683d;
+  --good-bg: #e4f4ea;
+  --warn-ink: #8a4b00;
+  --warn-bg: #fff1dc;
+  --bad-ink: #a11d14;
+  --bad-bg: #fdebea;
+  --neutral-bg: #efe9dc;
+
+  --font: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --radius: 16px;
+  --radius-small: 10px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --content-max: 1320px;
+  --focus: 0 0 0 3px rgba(42, 79, 135, 0.5);
+  --rail: #1b2733;
+  --rail-ink: #c9d4e0;
+  --rail-muted: #a9b8c8;
+  --rail-active: #2c4259;
+  --playhead: #7a2e12;
+}

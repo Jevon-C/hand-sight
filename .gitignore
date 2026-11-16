@@ -1,0 +1,17 @@
+target/
+__pycache__/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+*.egg-info/
+spike/spike-report.md
+spike/*-report.md
+data/
+models/
+*.pyd
+*.pdb
+*.so
+onnxruntime_profile_*.json
+crates/ui/dist/

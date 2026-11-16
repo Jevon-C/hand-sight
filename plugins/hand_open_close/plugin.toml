@@ -1,0 +1,89 @@
+id = "hand_open_close"
+version = "0.1.0"
+name = "Hand open and close"
+clinical_item = "MDS-UPDRS 3.5"
+status = "available"
+summary = "Opening and closing the hand: rate, size, slowing, hesitations and arrests."
+entrypoint = "plugin.py"
+
+[capture]
+min_fps = 30
+min_duration_seconds = 10
+board_required = false
+instructions = "Film the hand from the front, held up with the palm facing the camera and the fingers visible, for at least ten seconds of continuous opening and closing as wide and as fast as possible. 30 frames per second is the minimum; 60 is better."
+
+[[metrics]]
+id = "cycle_count"
+name = "Cycle count"
+unit = ""
+description = "Number of times the hand was opened and closed."
+default_selected = true
+
+[[metrics]]
+id = "cycle_rate"
+name = "Cycle rate"
+unit = "cycles/s"
+description = "Openings per second between the first and last opening."
+default_selected = true
+
+[[metrics]]
+id = "mean_range"
+name = "Mean range"
+unit = "palm lengths"
+description = "Average difference between the open hand and the fist, as fingertip distance from the wrist in palm lengths."
+default_selected = true
+
+[[metrics]]
+id = "range_variability"
+name = "Range variability"
+unit = "%"
+description = "How much the size of the movement varies, as a percentage of its mean."
+default_selected = false
+
+[[metrics]]
+id = "range_decrement"
+name = "Range decrement"
+unit = "%"
+description = "How much smaller the last cycles are than the first, from a straight-line fit. Positive means they shrank."
+default_selected = true
+
+[[metrics]]
+id = "hesitations"
+name = "Hesitations"
+unit = ""
+description = "Gaps between openings that are clearly longer than usual."
+default_selected = true
+
+[[metrics]]
+id = "arrests"
+name = "Arrests"
+unit = ""
+description = "Long stops in the movement."
+default_selected = true
+
+[[parameters]]
+id = "min_range"
+name = "Smallest movement"
+description = "Openings and closings smaller than this, in palm lengths, are not counted."
+kind = "number"
+default = 0.3
+min = 0.05
+max = 2.0
+
+[[parameters]]
+id = "hesitation_factor"
+name = "Hesitation threshold"
+description = "A gap this many times longer than the typical gap counts as a hesitation."
+kind = "number"
+default = 1.5
+min = 1.1
+max = 5.0
+
+[[parameters]]
+id = "arrest_factor"
+name = "Arrest threshold"
+description = "A gap this many times longer than the typical gap counts as an arrest. Must exceed the hesitation threshold."
+kind = "number"
+default = 3.0
+min = 1.2
+max = 20.0

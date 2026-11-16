@@ -1,0 +1,31 @@
+# Template for a new test plug-in. Copy this folder to plugins/<your_id>/ and edit.
+# The folder name must equal `id`. See docs/PLUGIN-AUTHORING.md.
+id = "my_test"
+version = "0.1.0"
+name = "My test"
+clinical_item = "MDS-UPDRS 3.x"
+status = "available"          # or "planned" (then delete the entrypoint line)
+summary = "One sentence saying what this test measures."
+entrypoint = "plugin.py"
+
+[capture]
+min_fps = 50
+min_duration_seconds = 10
+board_required = false
+instructions = "How to film the video, in a sentence a volunteer can follow."
+
+[[metrics]]
+id = "my_metric"
+name = "My metric"
+unit = "per second"
+description = "What the number means."
+default_selected = true
+
+[[parameters]]
+id = "threshold"
+name = "Threshold"
+description = "What changing this does."
+kind = "number"
+default = 0.1
+min = 0
+max = 1

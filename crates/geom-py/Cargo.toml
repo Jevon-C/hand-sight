@@ -1,0 +1,26 @@
+[package]
+name = "axonhand-geom-py"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+name = "_geom"
+crate-type = ["cdylib"]
+
+[dependencies]
+axonhand-geom = { path = "../geom" }
+nalgebra = "0.33"
+pyo3 = { version = "0.23", features = ["extension-module", "abi3-py312"] }
+
+# PyO3's generated glue contains unsafe code, so this crate cannot use `forbid`.
+# Everything we write here is safe; `deny` still blocks it in our own code.
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"

@@ -1,0 +1,18 @@
+[package]
+name = "axonhand-hand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Hand Sight hand tracking: the two-stage palm and landmark pipeline, in Rust."
+
+[dependencies]
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "load-dynamic", "api-22"] }
+thiserror = "2"
+
+[dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[lints]
+workspace = true

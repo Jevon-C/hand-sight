@@ -1,0 +1,89 @@
+id = "finger_tapping"
+version = "0.2.0"
+name = "Finger tapping"
+clinical_item = "MDS-UPDRS 3.4"
+status = "available"
+summary = "Thumb and index finger tapping: rate, size, slowing, hesitations and arrests."
+entrypoint = "plugin.py"
+
+[capture]
+min_fps = 30
+min_duration_seconds = 10
+board_required = false
+instructions = "Film the hand from the front with the palm facing the camera, fingers visible, for at least ten seconds of continuous tapping as large and as fast as possible. 30 frames per second is the minimum; 60 is better."
+
+[[metrics]]
+id = "tap_count"
+name = "Tap count"
+unit = ""
+description = "Number of finger taps found in the video."
+default_selected = true
+
+[[metrics]]
+id = "tap_rate"
+name = "Tap rate"
+unit = "taps/s"
+description = "Taps per second between the first and last tap."
+default_selected = true
+
+[[metrics]]
+id = "mean_amplitude"
+name = "Mean amplitude"
+unit = "palm lengths"
+description = "Average widest opening between thumb and index finger, as a fraction of the palm length."
+default_selected = true
+
+[[metrics]]
+id = "amplitude_variability"
+name = "Amplitude variability"
+unit = "%"
+description = "How much the size of the taps varies, as a percentage of their mean."
+default_selected = false
+
+[[metrics]]
+id = "amplitude_decrement"
+name = "Amplitude decrement"
+unit = "%"
+description = "How much smaller the last taps are than the first, from a straight-line fit. Positive means the taps shrank."
+default_selected = true
+
+[[metrics]]
+id = "hesitations"
+name = "Hesitations"
+unit = ""
+description = "Gaps between taps that are clearly longer than usual."
+default_selected = true
+
+[[metrics]]
+id = "arrests"
+name = "Arrests"
+unit = ""
+description = "Long stops in the tapping."
+default_selected = true
+
+[[parameters]]
+id = "min_amplitude"
+name = "Smallest tap"
+description = "Openings smaller than this, in palm lengths, are not counted as taps."
+kind = "number"
+default = 0.15
+min = 0.02
+max = 1.0
+
+[[parameters]]
+id = "hesitation_factor"
+name = "Hesitation threshold"
+description = "A gap this many times longer than the typical gap counts as a hesitation."
+kind = "number"
+default = 1.5
+min = 1.1
+max = 5.0
+
+[[parameters]]
+id = "arrest_factor"
+name = "Arrest threshold"
+description = "A gap this many times longer than the typical gap counts as an arrest. Must exceed the hesitation threshold."
+kind = "number"
+default = 3.0
+min = 1.2
+max = 20.0

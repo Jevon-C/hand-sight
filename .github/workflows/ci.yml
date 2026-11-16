@@ -1,0 +1,101 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    name: check (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      # maturin develop installs into a virtual environment, so make one and use it for every
+      # later step, exactly as scripts/check.sh expects.
+      - name: Python environment
+        run: |
+          python -m venv .venv
+          if [ -d .venv/Scripts ]; then BIN="$PWD/.venv/Scripts"; else BIN="$PWD/.venv/bin"; fi
+          echo "$BIN" >> "$GITHUB_PATH"
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+      - name: Install Python tools
+        run: python -m pip install --upgrade pip && python -m pip install maturin pytest hypothesis mypy ruff
+      - name: Build and install axonhand
+        working-directory: python
+        run: maturin develop --quiet
+      - name: Python lint, types and tests
+        working-directory: python
+        run: |
+          ruff check . ../plugins
+          ruff format --check . ../plugins
+          mypy src tests
+          for plugin in ../plugins/*/plugin.py; do mypy "$plugin"; done
+          pytest -q
+      - name: Point the Rust tests at this Python
+        run: echo "AXONHAND_PYTHON=$(python -c 'import sys; print(sys.executable)')" >> "$GITHUB_ENV"
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test --all
+      - name: Browser app compiles for WebAssembly
+        run: cargo check -p axonhand-ui --target wasm32-unknown-unknown
+
+  e2e:
+    name: browser test
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Python environment
+        run: |
+          python -m venv .venv
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+      - name: Install Python tools
+        run: python -m pip install --upgrade pip && python -m pip install maturin pytest playwright
+      - name: Build and install axonhand
+        working-directory: python
+        run: maturin develop --quiet
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
+      - name: Install the test browser
+        run: python -m playwright install --with-deps chromium
+      - name: Build the app and the server
+        run: |
+          (cd crates/ui && trunk build)
+          cargo build -p axonhand-server
+      - name: Browser test
+        env:
+          AXONHAND_E2E_BROWSER: chromium
+        run: python -m pytest e2e -v

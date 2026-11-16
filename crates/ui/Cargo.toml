@@ -1,0 +1,21 @@
+[package]
+name = "axonhand-ui"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Hand Sight browser app (Leptos, client-side rendered)."
+
+[dependencies]
+axonhand-api = { path = "../api" }
+leptos = { version = "0.8", features = ["csr"] }
+leptos_router = "0.8"
+console_error_panic_hook = "0.1"
+web-sys = { version = "0.3.107", features = ["FormData", "File", "XmlHttpRequest", "XmlHttpRequestUpload", "ProgressEvent", "Event", "EventTarget", "HtmlInputElement", "FileList", "DragEvent", "DataTransfer", "Blob", "Url", "HtmlVideoElement", "HtmlMediaElement", "HtmlCanvasElement", "CanvasRenderingContext2d", "KeyboardEvent", "Window", "Element", "DomRect"] }
+wasm-bindgen = "0.2.130"
+gloo-net = "0.7.0"
+serde_json = "1.0.154"
+serde = { version = "1.0.229", features = ["derive"] }
+
+[lints]
+workspace = true

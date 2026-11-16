@@ -1,0 +1,12 @@
+# Build the browser app with `trunk build` from this folder. Output goes to dist/, which the
+# server serves. `trunk serve` runs the app on port 8081 and forwards /api to the server.
+[build]
+target = "index.html"
+dist = "dist"
+
+[serve]
+addresses = ["127.0.0.1"]
+port = 8081
+
+[[proxy]]
+backend = "http://127.0.0.1:8080/api/"

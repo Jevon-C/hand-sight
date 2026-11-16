@@ -1,0 +1,66 @@
+id = "postural_tremor"
+version = "0.1.0"
+name = "Postural tremor"
+clinical_item = "MDS-UPDRS 3.15"
+status = "available"
+summary = "Tremor of the outstretched hand: frequency, size and regularity."
+entrypoint = "plugin.py"
+
+[capture]
+min_fps = 30
+min_duration_seconds = 10
+board_required = false
+instructions = "Film one hand from the front, held out in front of the body with the palm down and the fingers spread, as still as possible, for at least ten seconds. The camera must not move: use a stand. 30 frames per second is the minimum; 60 is better, and needed to judge whether the tremor is above the tracker noise."
+
+[[metrics]]
+id = "dominant_frequency"
+name = "Tremor frequency"
+unit = "Hz"
+description = "Frequency of the strongest movement of the palm between 3 and 12 Hz."
+default_selected = true
+
+[[metrics]]
+id = "amplitude_rms"
+name = "Tremor size (rms)"
+unit = "palm lengths"
+description = "Root mean square of the palm movement in the tremor band, in palm lengths."
+default_selected = true
+
+[[metrics]]
+id = "amplitude_peak_to_peak"
+name = "Tremor size (peak to peak)"
+unit = "palm lengths"
+description = "Peak to peak size of a steady oscillation with that rms: 2.83 times the rms."
+default_selected = false
+
+[[metrics]]
+id = "band_share"
+name = "Share in tremor band"
+unit = "%"
+description = "Percentage of the movement above 1 Hz that lies in the tremor band."
+default_selected = false
+
+[[metrics]]
+id = "regularity"
+name = "Regularity"
+unit = ""
+description = "How much of the tremor-band movement lies within 1 Hz of the strongest frequency: near 1 for a steady tremor, low for an irregular one."
+default_selected = true
+
+[[parameters]]
+id = "band_low"
+name = "Lowest tremor frequency"
+description = "Movement below this frequency, in Hz, is not counted as tremor."
+kind = "number"
+default = 3.0
+min = 0.5
+max = 10.0
+
+[[parameters]]
+id = "band_high"
+name = "Highest tremor frequency"
+description = "Movement above this frequency, in Hz, is not counted as tremor. It is lowered automatically to stay below the frame rate's limit."
+kind = "number"
+default = 12.0
+min = 4.0
+max = 25.0

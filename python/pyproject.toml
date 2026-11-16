@@ -1,0 +1,36 @@
+[project]
+name = "axonhand"
+version = "0.1.0"
+requires-python = ">=3.12,<3.14"
+license = "MIT"
+dependencies = ["numpy", "onnx", "onnxruntime", "av", "pillow"]
+
+[project.optional-dependencies]
+npu = ["onnxruntime-qnn"]
+dev = ["pytest", "hypothesis", "mypy", "ruff", "maturin"]
+e2e = ["playwright>=1.45", "pytest"]
+
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[tool.maturin]
+python-source = "src"
+module-name = "axonhand._geom"
+manifest-path = "../crates/geom-py/Cargo.toml"
+features = ["pyo3/extension-module"]
+
+[tool.ruff]
+line-length = 100
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/axonhand/tools/annotate_page.py" = ["E501"]
+
+[tool.mypy]
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["onnx.*", "onnxruntime.*", "onnxruntime_qnn.*"]
+ignore_missing_imports = true

@@ -1,0 +1,73 @@
+id = "pronation_supination"
+version = "0.1.0"
+name = "Pronation and supination"
+clinical_item = "MDS-UPDRS 3.6"
+status = "available"
+summary = "Turning the hand over and back: rate, relative size of the turns, slowing, hesitations and arrests."
+entrypoint = "plugin.py"
+
+[capture]
+min_fps = 30
+min_duration_seconds = 10
+board_required = false
+instructions = "Film from the front with the forearm held upright in front of the chest and the hand up. Turn the palm towards the camera and away from it, as fast and as fully as possible, for at least ten seconds. The back and the front of the hand must both be seen. 30 frames per second is the minimum; 60 is better."
+
+[[metrics]]
+id = "turn_count"
+name = "Turn count"
+unit = ""
+description = "Number of times the hand was turned over (each half of a full cycle is one turn)."
+default_selected = true
+
+[[metrics]]
+id = "cycle_rate"
+name = "Cycle rate"
+unit = "cycles/s"
+description = "Full turns over and back per second between the first and last turn."
+default_selected = true
+
+[[metrics]]
+id = "excursion_variability"
+name = "Turn size variability"
+unit = "%"
+description = "How much the size of the turns varies, as a percentage of their mean. Size is relative to the biggest turn in the video."
+default_selected = false
+
+[[metrics]]
+id = "excursion_decrement"
+name = "Turn size decrement"
+unit = "%"
+description = "How much smaller the last turns are than the first, from a straight-line fit. Positive means they shrank. The angle itself is not measured, only how far the hand shows its back or its palm."
+default_selected = true
+
+[[metrics]]
+id = "hesitations"
+name = "Hesitations"
+unit = ""
+description = "Gaps between turns that are clearly longer than usual."
+default_selected = true
+
+[[metrics]]
+id = "arrests"
+name = "Arrests"
+unit = ""
+description = "Long stops in the turning."
+default_selected = true
+
+[[parameters]]
+id = "hesitation_factor"
+name = "Hesitation threshold"
+description = "A gap this many times longer than the typical gap counts as a hesitation."
+kind = "number"
+default = 1.5
+min = 1.1
+max = 5.0
+
+[[parameters]]
+id = "arrest_factor"
+name = "Arrest threshold"
+description = "A gap this many times longer than the typical gap counts as an arrest. Must exceed the hesitation threshold."
+kind = "number"
+default = 3.0
+min = 1.2
+max = 20.0

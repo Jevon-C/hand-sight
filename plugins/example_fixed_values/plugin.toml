@@ -1,0 +1,38 @@
+# A worked example: it ignores the video and returns fixed numbers. It exists to show the
+# plug-in format and to test the machinery. Its numbers mean nothing.
+id = "example_fixed_values"
+version = "1.0.0"
+name = "Example (fixed values)"
+clinical_item = "None. For development only"
+status = "available"
+summary = "Returns made-up numbers without looking at the video. Shows how a plug-in is built."
+entrypoint = "plugin.py"
+
+[capture]
+min_fps = 1
+min_duration_seconds = 1
+board_required = false
+instructions = "Any video will do. The video is not read."
+
+[[metrics]]
+id = "example_rate"
+name = "Example rate"
+unit = "per second"
+description = "A fixed number scaled by the multiplier setting."
+default_selected = true
+
+[[metrics]]
+id = "example_count"
+name = "Example count"
+unit = ""
+description = "A fixed whole number."
+default_selected = true
+
+[[parameters]]
+id = "multiplier"
+name = "Multiplier"
+description = "Scales the example rate."
+kind = "number"
+default = 1.0
+min = 0.0
+max = 10.0
