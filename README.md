@@ -9,7 +9,7 @@ in the browser.
 > error has been measured against hand-marked clips (docs/EVALUATION.md). Do not use them for
 > diagnosis or treatment decisions.
 
-## Start here (a five-minute tour for reviewers)
+## Start here 
 
 If you only read a few things, read these. Each shows a different part of the engineering.
 
