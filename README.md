@@ -125,4 +125,4 @@ runs on Arm Windows (history, see spike/README.md).
 
 ## Licence
 
-MIT, see LICENSE. Contributions: see CONTRIBUTING.md. Security and data handling: SECURITY.md.
+MIT, see LICENSE. Third-party material and its licences: THIRD-PARTY-NOTICES.md. Contributions: see CONTRIBUTING.md. Security and data handling: SECURITY.md.
