@@ -317,9 +317,12 @@ description = "d"
         }
     }
 
+    /// Limits for plug-ins that are expected to finish. The time limit is generous because
+    /// starting Python can take many seconds on a busy shared CI machine; the tests that need a
+    /// short limit set their own.
     fn quick() -> Limits {
         Limits {
-            timeout: Duration::from_secs(10),
+            timeout: Duration::from_secs(60),
             max_output_bytes: 100_000,
         }
     }
